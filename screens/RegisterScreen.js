@@ -3,12 +3,13 @@ import { StatusBar } from 'expo-status-bar'
 import { KeyboardAvoidingView } from 'react-native'
 import { StyleSheet, View } from 'react-native';
 import {Button, Input, Text} from 'react-native-elements';
-
+import {auth} from "../firebase";
 const RegisterScreen = ({navigation}) => {
     const [name,setName] = useState("");
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
     const [imageUrl,setImageUrl] = useState("");
+    
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -17,9 +18,21 @@ const RegisterScreen = ({navigation}) => {
         
     }, [navigation]);
 
-    const register = () =>{};
+    const register = () =>{
+    
+     auth.createUserWithEmailAndPassword(email,password)
+     .then((authUser) =>{
+         authUser.user.updateProfile({
+             displayName:name,
+             photoURL:imageUrl ||
+             "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+         });
+     })
+     .catch(error => alert(error.message));
+
+    };
     return (
-        <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <View behavior="padding" style={styles.container}>
             <StatusBar style="light"/>
 
             <Text h3 style={{marginBottom:50}}>
@@ -36,22 +49,23 @@ const RegisterScreen = ({navigation}) => {
              placeholder="Email"
              type='email'
              value={email}
-             onChangeText={(email)=> setEmail(email)}
+             onChangeText={(text)=> setEmail(text.trim())}
              />
              <Input 
              placeholder="Password"
               type='password'
+              secureTextEntry
              value={password}
              onChangeText={(text)=> setPassword(text)}
              />
+                <Input
+             placeholder="Image url" 
+              type="text"
+              value={imageUrl}
+              onChangeText={(text) => setImageUrl(text)}
+              onSubmitEditing={register}
+              />
              
-             <Input 
-             placeholder="Profile Picture URL (optional)"
-              type='password'
-             value={imageUrl}
-             onChangeText={(text)=> setImageUrl(text)}
-             onSubmitEditing={register}
-             />
             </View>
             <Button
             containerStyle={styles.button}
@@ -60,8 +74,15 @@ const RegisterScreen = ({navigation}) => {
             
             
             />
+            <Button
+            containerStyle={styles.button}
+            raised 
+            onPress ={()=>navigation.navigate('Login')} title="Login"
+            
+            
+            />
             <View style={{height:100}}/>
-        </KeyboardAvoidingView>
+        </View>
     )
 }
 

@@ -1,23 +1,35 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import { StyleSheet } from 'react-native';
 import { View, Text} from 'react-native';
 import {Button, Input, Image} from 'react-native-elements';
 import {StatusBar} from "expo-status-bar";
 import {KeyboardAvoidingView} from 'react-native';
+import {auth} from "../firebase";
 const LoginScreen = ({navigation}) => {
     const [email,setEmail]=useState('');
     const [password,setPassword]=useState('');
+
+    useEffect(()=>{
+     const unsubscribe = auth.onAuthStateChanged((authUser) => {
+
+         console.log(authUser);
+          if(authUser){
+              navigation.replace("Home");
+          }
+      });
+      return unsubscribe;
+    },[])
     const signIn =() =>{
 
     }
     return (
-        <KeyboardAvoidingView behavior='padding' enabled style={styles.container}>
+        <View behavior='padding' enabled style={styles.container}>
             <StatusBar style="light"/>
             
             <Image 
            source={{
                uri:
-               "https://static.thenounproject.com/png/53855-200.png",
+               "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
            }}
            style={{width:200, height:200}}
         />
@@ -34,6 +46,7 @@ const LoginScreen = ({navigation}) => {
               type="password"
               value={password}
               onChangeText={(text) => setPassword(text)}/>
+           
         </View>
         <Button containerStyle={styles.button} onPress={signIn} title="Login"/>
         <Button
@@ -42,7 +55,7 @@ const LoginScreen = ({navigation}) => {
          type="outline" 
          title="Register"/>
         <View style={{height:100}}/>
-        </KeyboardAvoidingView>
+        </View>
     )
 }
 
