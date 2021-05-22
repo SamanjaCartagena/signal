@@ -20,7 +20,9 @@ const LoginScreen = ({navigation}) => {
       return unsubscribe;
     },[])
     const signIn =() =>{
-
+      auth
+      .signInWithEmailAndPassword(email.toString().trim(),password.toString().trim())
+      .catch((error) =>alert(error));
     }
     return (
         <View behavior='padding' enabled style={styles.container}>
@@ -29,23 +31,27 @@ const LoginScreen = ({navigation}) => {
             <Image 
            source={{
                uri:
-               "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+               "https://static.thenounproject.com/png/2255544-200.png",
            }}
            style={{width:200, height:200}}
         />
         <View style={styles.inputContainer}>
             <Input 
             placeholder="Email" 
-            autoFocus type="email"
+            type="email"
              value={email} 
-             onChange={(text)=> setEmail(text)}/>
+             onChangeText={(text)=> setEmail(text)}/>
 
             <Input
              placeholder="Password" 
              secureTextEntry
               type="password"
               value={password}
-              onChangeText={(text) => setPassword(text)}/>
+              onChangeText={(text) => setPassword(text)}
+              onSubmitEditing={signIn}
+              
+              
+              />
            
         </View>
         <Button containerStyle={styles.button} onPress={signIn} title="Login"/>
@@ -55,6 +61,8 @@ const LoginScreen = ({navigation}) => {
          type="outline" 
          title="Register"/>
         <View style={{height:100}}/>
+          <Text style={{textAlign:'center'}}>Welcome to Husers where we connect the homeless community together</Text>
+
         </View>
     )
 }
@@ -66,13 +74,16 @@ const styles= StyleSheet.create({
      flex:1,
      alignItems:'center',
      justifyContent:'center',
-     backgroundColor:'white'
+     backgroundColor:'white',
     },
     inputContainer:{
         width:300,
+        borderWidth:2,
+        borderColor:'black',
+        
     }, 
     button:{
-      width:200,
+      width:300,
       marginTop:10,
     }
     

@@ -20,7 +20,7 @@ const RegisterScreen = ({navigation}) => {
 
     const register = () =>{
     
-     auth.createUserWithEmailAndPassword(email,password)
+     auth.createUserWithEmailAndPassword(email.toString().trim(),password.toString().trim())
      .then((authUser) =>{
          authUser.user.updateProfile({
              displayName:name,
@@ -49,7 +49,7 @@ const RegisterScreen = ({navigation}) => {
              placeholder="Email"
              type='email'
              value={email}
-             onChangeText={(text)=> setEmail(text.trim())}
+             onChangeText={(text)=> setEmail(text)}
              />
              <Input 
              placeholder="Password"
