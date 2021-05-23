@@ -1,13 +1,24 @@
 import { getStateFromPath } from '@react-navigation/core';
-import React,{useLayoutEffect} from 'react'
+import React,{useLayoutEffect, useEffect, useState} from 'react'
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native';
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import {Button, Avatar} from 'react-native-elements';
 import CustomListItem from '../components/CustomListItem';
 import {AntDesign, SimpleLineIcons} from "@expo/vector-icons";
 import {auth,db} from "../firebase";
 const HomeScreen = ({navigation}) => {
+   const  [chats, setChats] = useState([]);
+    
+   useEffect(() =>{
+      const unsubscribe = db.collection('chats').onSnapshot(snapshot =>(
+          setChats(snapshot.docs.map(doc =>({
+              id:doc.id,
+              data:doc.data()
+          })))
+      ))
+      return unsubscribe;
+   }, []);
 
     useLayoutEffect(() => {
        navigation.setOptions({
@@ -33,7 +44,7 @@ const HomeScreen = ({navigation}) => {
                 <AntDesign name='camerao' size={24} color='black'/>
                  </TouchableOpacity>
                  <TouchableOpacity 
-                 onPress={()=> navigation.naviagte("AddChat")}
+                 onPress={()=> navigation.navigate("AddChat")}
                  activeOpacity={0.5} >
                  <SimpleLineIcons name="pencil" size={24} color="black"/>
                  </TouchableOpacity>
@@ -55,11 +66,20 @@ const HomeScreen = ({navigation}) => {
     }
     return (
         <SafeAreaView>
-          <ScrollView>
-           <CustomListItem />
+          <ScrollView style={styles.container}>
+              {chats.map(({id, data:{chatName}}) =>(
+                          <CustomListItem key={id}  chatName={chatName}/>
+
+              ))}
           </ScrollView>
         </SafeAreaView>
     )
 }
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+   container:{
+       height:'100%',
+   }
+});
