@@ -9,7 +9,7 @@ const AddChatScreen = ({navigation}) => {
 
     useLayoutEffect(() =>{
           navigation.setOptions({
-              title: "Add a new chat",
+              title: "Add a new user",
               headerBackTitle:"Chats",
           })
     },[navigation]);
@@ -23,7 +23,7 @@ const AddChatScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
         <Input 
-          placeholder='Enter a chat name' value={input}
+          placeholder='Enter a user name' value={input}
           onChangeText={(text) => setInput(text)}
           onSubmitEditing={createChat}
           leftIcon={
@@ -31,7 +31,7 @@ const AddChatScreen = ({navigation}) => {
            name="wechat" type="antdesign" size={24} color="black" />
           }
           />
-          <Button onPress={createChat} title='Create new chat'/>
+          <Button onPress={createChat} title='Create new user'/>
            
            
 
