@@ -7,9 +7,11 @@ import { SafeAreaView, StatusBar } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native';
 import { Platform } from 'react-native';
 import { ScrollView, TextInput } from 'react-native';
-import { Keyboard } from 'react-native ';
 import { db,auth } from '../firebase';
 import * as firebase from "firebase";
+import { Alert } from 'react-native';
+import { Keyboard } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 const ChatScreen = ({navigation, route}) => {
     const [input,setInput] = useState("");
     useLayoutEffect(() =>{
@@ -68,12 +70,10 @@ const ChatScreen = ({navigation, route}) => {
         });
     },[navigation]);
 
-    const message = () => {
-
+    const sendMessage = () => {
         Keyboard.dismiss();
-        db.collection('chats').doc(route.params.id).collection('messages')
-        .add({
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        db.collection('chats').doc(route.params.id).collection('messages').add({
+            timestamp:firebase.firestore.FieldValue.serverTimestamp(),
             message:input,
             displayName:auth.currentUser.displayName,
             email:auth.currentUser.email
@@ -83,12 +83,14 @@ const ChatScreen = ({navigation, route}) => {
     return (
         <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
             <StatusBar style="light"/>
-          <View
+          <KeyboardAvoidingView
            behavior={Platform.OS === "ios" ? "padding" :"height"}
            style={styles.container}
            keyboardVerticalOffset={90}
           >
-             <>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
+
+              <>
              <ScrollView>
                  {/**Chat message */}
              </ScrollView>
@@ -96,21 +98,21 @@ const ChatScreen = ({navigation, route}) => {
                <TextInput 
                value={input}
                onChangeText={(text) => setInput(text)}
-               onSubmitEditing={message}
+               onSubmitEditing={sendMessage}
              placeholder ='Signal Message'
              style={styles.textInput}
 />
 
-<TouchableOpacity onPress={message} activeOpacity={0.5}>
-<Ionicons  name="send" size={24} color="black"/>
-
+<TouchableOpacity onPress={sendMessage} activeOpacity={0.5}>
+  <Ionicons name="send" size={24} color="black"/>
 </TouchableOpacity>
-             </View>
-             </>
           </View>
+          </>
+          </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 export default ChatScreen
 
