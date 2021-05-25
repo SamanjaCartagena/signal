@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import {Button, Input} from "react-native-elements";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 
 const AddChatScreen = ({navigation}) => {
     const [input,setInput] = useState("");
@@ -20,6 +20,7 @@ const AddChatScreen = ({navigation}) => {
             navigation.goBack()
         }).catch((error) => alert(error));
     }
+    
     return (
         <View style={styles.container}>
         <Input 
@@ -32,8 +33,9 @@ const AddChatScreen = ({navigation}) => {
           }
           />
           <Button onPress={createChat} title='Create new user'/>
-           
-           
+           <>
+           <Text>Hi</Text>
+           </>
 
     
 

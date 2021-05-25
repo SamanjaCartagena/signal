@@ -14,6 +14,7 @@ import { Keyboard } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native';
 const ChatScreen = ({navigation, route}) => {
     const [input,setInput] = useState("");
+    const [messages, setMessages] = useState([]);
     useLayoutEffect(() =>{
         navigation.setOptions({
             title:"Chat",
@@ -72,14 +73,29 @@ const ChatScreen = ({navigation, route}) => {
 
     const sendMessage = () => {
         Keyboard.dismiss();
-        db.collection('chats').doc(route.params.id).collection('messages').add({
+        db.collection('chats').doc(auth.currentUser.uid).collection('messages').add({
             timestamp:firebase.firestore.FieldValue.serverTimestamp(),
             message:input,
             displayName:auth.currentUser.displayName,
             email:auth.currentUser.email
         })
-        setInput('')
+        setInput('');
     };
+
+    useLayoutEffect(() =>{
+        const unsubscribe= db
+        .collection('chats')
+        .doc(auth.currentUser.uid)
+        .collection("messages")
+        .orderBy("timestamp","desc")
+        .onSnapshot((snapshot) =>setMessages(
+            snapshot.docs.map(doc => ({
+                id:doc.id,
+                data:doc.data()
+            }))
+        ));
+        return unsubscribe;
+    },[route])
     return (
         <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
             <StatusBar style="light"/>
@@ -92,7 +108,34 @@ const ChatScreen = ({navigation, route}) => {
 
               <>
              <ScrollView>
-                 {/**Chat message */}
+
+           {messages.map(({id,data}) =>
+           data.email === auth.currentUser.email ? (
+               <View key={id} style ={styles.receiver}>
+                   <Avatar
+                   position="absolute"
+                   rounded
+                   size={30}
+                   bottom={-15}
+                   right={-15}
+                   source={{
+                       uri:data.photoURL,
+                   }}
+
+                   />
+                   <Text style={styles.receiverText}>{data.message}</Text>
+
+               </View>
+           ):(
+               <View style={styles.sender}>
+                   <Avatar/>
+                   <Text style={styles.senderText}>{data.message}</Text>
+                   <Text style={styles.senderName}>{data.displayName}</Text>
+
+               </View>
+           )
+           
+           )}
              </ScrollView>
              <View style={styles.footer}>
                <TextInput 
@@ -129,6 +172,19 @@ const styles = StyleSheet.create({
        padding:15
 
     }, 
+    senderName:{
+        left:10,
+        paddingRight:10,
+        fontSize:10,
+        color:"white"
+    },
+    receiverText:{
+        color:"black",
+        fontWeight:"500",
+        marginLeft:10,
+        marginBottom:15,
+    },
+
     textInput:{
         bottom:0,
         height:40,
@@ -140,6 +196,27 @@ const styles = StyleSheet.create({
         padding:10,
         color:'black',
         borderRadius:30,
+    },
+    receiver:{
+        padding:15,
+        backgroundColor:"#ECECEC",
+        alignSelf:"flex-end",
+        borderRadius:20,
+        marginRight:15,
+        marginBottom:20,
+        maxWidth:"80%",
+        position:"relative",
+    },
+    sender:{
+        padding:15,
+        backgroundColor:"black",
+        color:"white",
+        alignSelf:"flex-start",
+        borderRadius:20,
+        margin:15,
+        maxWidth:"80%",
+        position:"relative",
+
     }
 
 })
